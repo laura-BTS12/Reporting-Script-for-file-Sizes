@@ -9,7 +9,7 @@ print("This script searches a given folder for its files paths and sizes.")
 folder = input('Which is the path of the folder you want to search? ')
 maxsize = input('What is the maximun size of the files to be reported? ')
 numberfiles = input ('How many files you want to retrieve? ')
-print(folder)
+
 systemfiles = list()
 
 for path, directories, files in os.walk(folder):
