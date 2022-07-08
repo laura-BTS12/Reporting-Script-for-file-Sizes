@@ -13,9 +13,9 @@ connection = sqlite3.connect(':memory:')
 #Input variables and help menu
 parser = argparse.ArgumentParser(description="This script searches a given folder for its files paths and sizes in MB.")
 parser.add_argument("-p", "--path", type=str, help="Path of the folder")
-parser.add_argument("-mb", "--mbytes", type=int, help="Maximun size in MB of the files, this is an optional parameter", default=10000000000000000, required=False)
-parser.add_argument("-n", "--number", type=int, help="Number of files to be retrieved, this is an optional parameter")
-parser.add_argument("-t", "--filetype", type=str, help="file extension", default="", required=False,)
+parser.add_argument("-mb", "--mbytes", type=int, help="Maximun size of the files in MB , this is an optional parameter", default=10000000000000000, required=False)
+parser.add_argument("-n", "--number", type=int, help="Number of files to be retrieved")
+parser.add_argument("-t", "--filetype", type=str, help="file extension, this is an optional parameter", default="", required=False,)
 
 args= parser.parse_args()
 
