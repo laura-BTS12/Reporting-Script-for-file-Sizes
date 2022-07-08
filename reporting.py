@@ -1,28 +1,45 @@
 #!/usr/bin/python
 
-from logging import root
-import os, sys
+# Work with an in-memory SQLite database and add help menu
 
-#Example folder
-#folder = '/home/usuario/Data_Science_Courses'
-print("This script searches a given folder for its files paths and sizes.")
-folder = input('Which is the path of the folder you want to search? ')
-maxsize = input('What is the maximun size of the files to be reported? ')
-numberfiles = input ('How many files you want to retrieve? ')
+from importlib.resources import path
+from logging import root
+import numbers
+import os, sys, argparse, sqlite3
+
+#Save in memory SQLite metadata
+connection = sqlite3.connect(':memory:')
+
+#Input variables and help menu
+parser = argparse.ArgumentParser(description="This script searches a given folder for its files paths and sizes in MB.")
+parser.add_argument("-p", "--path", type=str, help="Path of the folder")
+parser.add_argument("-mb", "--mbytes", type=int, help="Maximun size in MB of the files, this is an optional parameter", default=10000000000000000, required=False)
+parser.add_argument("-n", "--number", type=int, help="Number of files to be retrieved, this is an optional parameter")
+parser.add_argument("-t", "--filetype", type=str, help="file extension", default="", required=False,)
+
+args= parser.parse_args()
+
+folder = args.path
+maxsize = args.mbytes
+numberfiles = args.number
+extension = f"%{args.filetype}"
+
+
+#print(folder, maxsize, numberfiles)
 
 systemfiles = list()
 
-for path, directories, files in os.walk(folder):
+#Example folder
+#folder = /home/usuario/Data_Science_Courses
+
+for paths, directories, files in os.walk(folder):
     for _file in files:
-        full_path = os.path.join(path, _file)
-        size = os.path.getsize(full_path)
-        row = (full_path, size)
+        full_path = os.path.join(paths, _file)
+        bytes_size = os.path.getsize(full_path)
+        mb_size = int(bytes_size/1024*2)
+        row = (full_path, mb_size)
         systemfiles.append(row)
 
-
-# Work with an in-memory SQLite database again
-import sqlite3
-connection = sqlite3.connect(':memory:')
 
 # Create a table again for holding a path and size, just like before
 table = 'CREATE TABLE files (id integer primary key, path TEXT, bytes INTEGER)'
@@ -38,6 +55,7 @@ for metadata in systemfiles:
     connection.commit()
 
 
-query = f'SELECT path, bytes FROM files WHERE bytes<{maxsize} ORDER BY bytes DESC LIMIT({numberfiles})'
+query = f'SELECT path, bytes FROM files WHERE path LIKE "{extension}" AND bytes<{maxsize} ORDER BY bytes DESC LIMIT({numberfiles})'
 for i in cursor.execute(query):
     print(i)
+
